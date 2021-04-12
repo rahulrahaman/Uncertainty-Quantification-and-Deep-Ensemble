@@ -224,21 +224,3 @@ def perform_train(model, criterion, loaders, optimizer, scheduler, mixup, n_epoc
 
     return test_acc_list[-1]
 
-
-def calculate_ece(probs, correct, nbin=30, fn=abs):
-    """
-    Calculate ECE
-    :param probs: (np.array) probability predictions (max probability)
-    :param correct: (np.array) indicator whether prediction was true
-    :param nbin: (int) number of bins for calculating ECE
-    :param fn: (function) function to transform conf - acc to fn(conf - acc) for ECE, sECE
-    :return: (float) ece
-    """
-    bins = (probs*nbin).astype(np.int)
-    ece_total = np.array([np.sum(bins == i) for i in range(nbin+1)])
-    ece_correct = np.array([np.sum((bins == i)*correct) for i in range(nbin+1)])
-    acc = np.array([ece_correct/ece_total if ece_total > 0 else -1])
-    conf = np.array([np.mean(probs[bins == i]) for i in range(nbin+1)])
-    deviation = np.array([fn(acc[i] - conf[i]) if acc[i] >= 0 else 0 for i in range(nbin+1)])
-    return ece_total, ece_correct, deviation
-

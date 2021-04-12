@@ -1,11 +1,10 @@
 import torch, torchvision
 import torch.nn as nn
 import os
-# import utils.notebook_utils as nbutils
 import models
-import utils.notebook_datautils as datutils
+import utils.datautils as datutils
 import argparse
-import utils.notebook_trainutils as trainutil
+import utils.trainutils as trainutil
 
 
 def return_resnet34(nclass):
