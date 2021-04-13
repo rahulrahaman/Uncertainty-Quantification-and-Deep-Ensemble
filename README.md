@@ -25,4 +25,6 @@ optional arguments:
 
 ```
 For example, if you need to train a Deep Ensemble on CIFAR10 dataset with 1000 training samples and mixup with alpha 0.5, use the command
-``python train_ensemble.py --dataset CIFAR10 --nmodel 5 --mixup 0.5 --ntrain 1000 --epoch 300 --max_lr 0.05 --bsize 500 --wd 7e-4 --datadir /home/data/``
+```
+python train_ensemble.py --dataset CIFAR10 --nmodel 5 --mixup 0.5 --ntrain 1000 --epoch 300 --max_lr 0.05 --bsize 500 --wd 7e-4 --datadir /home/data/
+```
