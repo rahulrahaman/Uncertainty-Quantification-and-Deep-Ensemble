@@ -226,7 +226,7 @@ class ReformedCIFAR100(torchvision.datasets.CIFAR100):
         self.targets = self.targets[start: end]
 
 
-def return_loaders(dataset, base, start=None, end=None, batch_size=500, 
+def return_loaders(dataset, base, start=None, end=None, batch_size=500,
                    train_shuffle=True, valid_shuffle=True, **kwargs):
     """
 
@@ -278,7 +278,7 @@ def return_loaders(dataset, base, start=None, end=None, batch_size=500,
                                                                           batch_size=train_batchsize,
                                                                           shuffle=valid_shuffle, num_workers=num_workers)
 
-        cifar_test_dataset = dataset_fn(base, train=False, transform=TRAIN_AUGMENT, download=True)
+        cifar_test_dataset = dataset_fn(base, train=False, transform=TEST_AUGMENT, download=True)
 
         return_dict['test'] = torch.utils.data.DataLoader(cifar_test_dataset, batch_size=train_batchsize,
                                                           shuffle=False, num_workers=num_workers)
