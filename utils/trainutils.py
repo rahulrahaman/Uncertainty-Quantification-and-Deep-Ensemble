@@ -1,6 +1,9 @@
 import numpy as np
 import torch
+from torch.nn.functional import softmax
 import time as time
+import glob
+from tqdm import tqdm
 
 
 def mixup_data(x, y, alpha=1.0, device=None):
@@ -223,4 +226,57 @@ def perform_train(model, criterion, loaders, optimizer, scheduler, mixup, n_epoc
         test_acc_list.append(evaluate_test["accuracy"])
 
     return test_acc_list[-1]
+
+
+def infer_ensemble(model_file_pattern, model, dataloader, evalmode=True):
+    """
+
+    :param model_file_pattern: (str) name pattern for model files e.g. 'CIFAR10_ntrain-1000_MixUpAlpha-0.5_id-*.model'.
+                                Models with matching name pattern will be search inside the directory 'saved_models/'
+    :param model: (torch.nn.Module) model skeleton
+    :param dataloader: (torch.uitls.data.DataLoader) dataloader to run inference on
+    :param evalmode: (bool) whether to use model.eval for inference, if True, BatchNorm parameters are first updated
+                     by running the model on the dataloader first, hence it might be a little slow. If there are no
+                     modules that need eval, its better not to use eval. This is because mixup augmentation messes with
+                     the BatchNorm running averages.
+    :return: prediction (np.array) -> of shape M x N x C where M is number of models, N number of examples,
+                                      C number of classes
+             targets (np.array) -> of shape N.
+             model_files (list(str)) -> name of the model files in the same order as in the predictions
+    """
+    assert (type(dataloader.sampler) != torch.utils.data.RandomSampler), \
+        f"Shuffle attribute of dataloader needs to be False to run ensemble inference"
+
+    device = next(model.parameters()).device
+    model_files = glob.glob('saved_models/'+model_file_pattern)
+    print(f'Number of files found: {len(model_files)}')
+    predictions = []
+    targets = []
+    first_iter = True
+
+    for file in tqdm(model_files):
+        temp_predictions = []
+        model.load_state_dict(torch.load(file)['model_state'])
+        if evalmode:
+            _ = model.train()
+            with torch.no_grad():
+                for i, (image, label) in enumerate(dataloader):
+                    image = image.to(device)
+                    _ = model(image)
+                model.eval()
+        with torch.no_grad():
+            for i, (image, label) in enumerate(dataloader):
+                image = image.to(device)
+                pred = softmax(model(image), dim=-1).detach().cpu().numpy()
+                temp_predictions.append(pred)
+                if first_iter:
+                    targets.append(label)
+            first_iter = False
+        temp_predictions = np.concatenate(temp_predictions)
+        predictions.append(temp_predictions)
+
+    predictions = np.stack(predictions)
+    targets = np.concatenate(targets)
+    return predictions, targets, model_files
+
 

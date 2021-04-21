@@ -30,10 +30,11 @@ def calculate_ece(probs, correct, nbin=30, fn=abs):
     bins = (probs*nbin).astype(np.int)
     ece_total = np.array([np.sum(bins == i) for i in range(nbin+1)])
     ece_correct = np.array([np.sum((bins == i)*correct) for i in range(nbin+1)])
-    acc = np.array([ece_correct/ece_total if ece_total > 0 else -1])
+    acc = np.array([ece_correct[i]/ece_total[i] if ece_total[i] > 0 else -1 for i in range(nbin+1)])
     conf = np.array([np.mean(probs[bins == i]) for i in range(nbin+1)])
-    deviation = np.array([fn(acc[i] - conf[i]) if acc[i] >= 0 else 0 for i in range(nbin+1)])
-    return ece_total, ece_correct, deviation
+    deviation = np.sum([fn(acc[i] - conf[i])*ece_total[i] if acc[i] >= 0 else 0 for i in range(nbin+1)])
+    deviation /= np.sum(ece_total)
+    return ece_correct, ece_total, deviation
 
 
 def get_all_scores(probs, targets, nbin=30, fn=abs):
