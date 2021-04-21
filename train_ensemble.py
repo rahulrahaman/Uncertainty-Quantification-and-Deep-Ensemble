@@ -41,6 +41,7 @@ parser.add_argument("--epoch", type=int, help="Number of epochs to train")
 parser.add_argument("--max_lr", type=float, help="Maximum learning rate during LR scheduling (OneCycleLR)")
 parser.add_argument("--bsize", type=int, help="Batch size")
 parser.add_argument("--wd", type=float, help="Weight decay")
+parser.add_argument("--train", action="store_true")
 
 args = parser.parse_args()
 
@@ -50,19 +51,19 @@ loaders, num_class = datutils.return_loaders(dataset=args.dataset, base=args.dat
                                              start=args.ntrain, end=args.nval+args.ntrain)
 # Architecture
 model_def = model_dict[args.dataset]
+dataset = args.dataset.upper()
+savefile = dataset
+savefile += '_ntrain-' + str(len(loaders['train'].dataset))
+savefile += '_MixUpAlpha-' + str(args.mixup)
 
 for i in range(0, args.nmodel):
     model = model_def().to(device)
     optimizer, scheduler = trainutil.create_optim_schedule(model, loaders['train'], args.epoch, max_lr=args.max_lr,
-                                                           weight_decay=args.wd)
+                                                           weight_decay=args.wd, pct_start=0.1)
     criterion = torch.nn.CrossEntropyLoss(reduction='mean')
     last_accuracy = trainutil.perform_train(model=model, criterion=criterion, loaders=loaders, optimizer=optimizer,
                                             scheduler=scheduler, mixup=args.mixup, n_epoch=args.epoch, device=device)
 
-    dataset = args.dataset.upper()
-    savefile = dataset
-    savefile += '_ntrain-' + str(len(loaders['train'].dataset))
-    savefile += '_MixUpAlpha-' + str(args.mixup)
     savefile += '_id-' + str(i+1)
     checkpoint = {'model_state': model.state_dict(),
                   'optim_state': optimizer.state_dict(),
