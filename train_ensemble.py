@@ -41,7 +41,6 @@ parser.add_argument("--epoch", type=int, help="Number of epochs to train")
 parser.add_argument("--max_lr", type=float, help="Maximum learning rate during LR scheduling (OneCycleLR)")
 parser.add_argument("--bsize", type=int, help="Batch size")
 parser.add_argument("--wd", type=float, help="Weight decay")
-parser.add_argument("--train", action="store_true")
 
 args = parser.parse_args()
 
@@ -64,9 +63,8 @@ for i in range(0, args.nmodel):
     last_accuracy = trainutil.perform_train(model=model, criterion=criterion, loaders=loaders, optimizer=optimizer,
                                             scheduler=scheduler, mixup=args.mixup, n_epoch=args.epoch, device=device)
 
-    savefile += '_id-' + str(i+1)
     checkpoint = {'model_state': model.state_dict(),
                   'optim_state': optimizer.state_dict(),
                   'acc': last_accuracy}
-    torch.save(checkpoint, 'saved_models/' + savefile + '.model')
+    torch.save(checkpoint, 'saved_models/' + savefile + '_id-' + str(i+1) + '.model')
 
