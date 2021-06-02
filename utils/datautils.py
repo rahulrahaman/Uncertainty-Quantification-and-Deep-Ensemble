@@ -114,8 +114,8 @@ class RetinopathyDataset(Data.Dataset):
     def __init__(self, root, train, transform, binary=True, balance=True, size=None):
         # root += 'DIABETIC_RETINOPATHY_RESZ/'  # DIABETIC_RETINOPATHY_CLAHE_RESZ
         if train:
-            self.img_dir = root + 'train/'
-            label_csv = root + 'trainLabels.csv'
+            self.img_dir = os.path.join(root, 'train/')
+            label_csv = os.path.join(root, 'trainLabels.csv')
             with open(label_csv, 'r') as label_file:
                 label_tuple = [line.strip().split(',')[:2] for line in label_file.readlines()[1:]]
             self.imgs = [item[0] for item in label_tuple]
@@ -127,8 +127,8 @@ class RetinopathyDataset(Data.Dataset):
             self.labels += [int(item[1]) for item in label_tuple[:30000]]
 
         else:
-            self.img_dir = root + 'test/'
-            label_csv = root + 'testLabels.csv'
+            self.img_dir = os.path.join(root, 'test/')
+            label_csv = os.path.join(root, 'testLabels.csv')
             with open(label_csv, 'r') as label_file:
                 label_tuple = [line.strip().split(',')[:2] for line in label_file.readlines()[1:]]
             self.imgs = [item[0] for item in label_tuple[30000:]]

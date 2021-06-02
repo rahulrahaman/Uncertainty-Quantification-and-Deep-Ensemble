@@ -12,9 +12,9 @@ def prob_power_t(prob, t):
     """
     raised_prob = prob**t
     if type(raised_prob) == torch.Tensor:
-        raised_prob = raised_prob / torch.sum(prob, dim=-1, keepdim=True)
+        raised_prob = raised_prob / torch.sum(raised_prob, dim=-1, keepdim=True)
     else:
-        raised_prob = raised_prob / np.sum(prob, axis=-1, keepdims=True)
+        raised_prob = raised_prob / np.sum(raised_prob, axis=-1, keepdims=True)
     return raised_prob
 
 
@@ -75,5 +75,5 @@ def perform_tempscale(probs, targets):
     temperatures = temperatures[np.isnan(losses)==False]
     losses = losses[np.isnan(losses)==False]
     best_temp = temperatures[np.argmin(losses)]
-    return best_temp
+    return best_temp, losses, temperatures
 
