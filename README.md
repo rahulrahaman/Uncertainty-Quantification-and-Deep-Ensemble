@@ -1,6 +1,7 @@
 # Uncertainty Quantification and Deep Ensemble
 ##### Experiments from our work Uncertainty Quantification and Deep Ensemble https://arxiv.org/abs/2007.08792
 
+For the visualization of the under-confidence of ensembles and how pool-then-calibrate helps regain calibration please look into the notebook `evaluate_uq.ipynb`
 
 In order to train a Deep Ensemble, use the python file `train_ensemble.py`. To get details of the command line arguments use the command `python train_ensemble.py --h`.
 This will give the detailed usage of the arguments
@@ -28,3 +29,4 @@ For example, if you need to train a Deep Ensemble on CIFAR10 dataset with 1000 t
 ```
 python train_ensemble.py --dataset CIFAR10 --nmodel 5 --mixup 0.5 --ntrain 1000 --epoch 300 --max_lr 0.05 --bsize 500 --wd 7e-4 --datadir /home/data/
 ```
+
